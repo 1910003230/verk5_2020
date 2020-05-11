@@ -66,11 +66,16 @@ def Logged(id):
 
 @app.route('/info', methods=['GET', 'POST'])
 def info():
+    account = []
     if request.method == 'POST':
         notendanafn = request.form['notendanafn']
         lykilord = request.form['lykilord']
-        db.child("user").push({"usr":notendanafn, "pwd":lykilord}) 
-        return '<h1>Account created<h1> <br><a href="/">Return to homepage</a>'
+        account.append(notendanafn)
+        if notendanafn not in account:
+            db.child("user").push({"usr":notendanafn, "pwd":lykilord}) 
+            return '<h1>Account created<h1> <br><a href="/">Return to homepage</a>'
+        else:
+            return "<h1>Notandanafn tekin. Veldu annað!</h1>"
     else:
         return "<h1>ma ekki </h1>"
 
