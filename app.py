@@ -77,10 +77,11 @@ def info():
         lykilord = request.form['lykilord']
         if notendanafn in account:
             return "<h1>Notandanafn tekin. Veldu annað!</h1>"
-        db.child("user").push({"usr":notendanafn, "pwd":lykilord})
-        nam=notendanafn
-        account.append(nam) 
-        return '<h1>Account created<h1> <br><a href="/">Return to homepage</a>'
+        else:
+            db.child("user").push({"usr":notendanafn, "pwd":lykilord})
+            nam=notendanafn
+            account.append(nam) 
+            return '<h1>Account created<h1> <br><a href="/">Return to homepage</a>'
     else:
         return "<h1>ma ekki </h1>"
 
