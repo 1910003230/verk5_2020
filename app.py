@@ -5,9 +5,21 @@ app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'Leyno'
 
+@app.errorhandler(403)
+def error403(error):
+    return '<h1> Notandi ekki til!</h1>', 403
+
 @app.errorhandler(404)
 def error404(error):
-    return '<h1> Síða ekki til!</h1>', 404
+    return '<h1> Notandi ekki til!</h1>', 404
+
+@app.errorhandler(405)
+def error405(error):
+    return '<h1> Notandi ekki til!</h1>', 405
+
+@app.errorhandler(500)
+def error500(error):
+    return '<h1> Notandi ekki til!</h1>', 500
 
 config = {
     "apiKey": "AIzaSyCjVuTataPfXP1TFX7g4sjFPth6_9gGFV0",
@@ -24,11 +36,31 @@ fb = pyrebase.initialize_app(config)
 db = fb.database()
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
+    try:
+        if request.method == 'POST':
+            nafn = request.form['notendanafn']
+            lykilord = request.form['lykilord']
+            u = db.child("user").get().val()
+            lst = list(u.items())
+            tala = 0
+            for i in lst:
+                ID = lst[tala][1]['usr']
+                PWD = lst[tala][1]['pwd']
+                if nafn == ID and lykilord == PWD:
+                    return render_template("User.html", ID = ID, PWD = PWD)
+                elif nafn == ID and lykilord != PWD:
+                    return "<h1>Vitlaust lykilorð</h1>"
+                elif nafn != ID:
+                    return "<h1>notandi ekki til</h1>"
+                else:
+                    tala = tala + 1
+    except:
+        return "<h1>Notandi ekki til. Reyndu aftur!</h1>"
     return render_template("home.html")
 
-@app.route('/Logged/<id>', methods=['GET', 'POST'])
+@app.route('/user/<id>', methods=['GET', 'POST'])
 def Logged(id):
     return render_template("Login.html")
 
@@ -38,7 +70,7 @@ def info():
         notendanafn = request.form['notendanafn']
         lykilord = request.form['lykilord']
         db.child("user").push({"usr":notendanafn, "pwd":lykilord}) 
-        return '<a href="/">Login page</a>'
+        return '<h1>Account created<h1> <br><a href="/">Return to homepage</a>'
     else:
         return "<h1>ma ekki </h1>"
 
@@ -51,12 +83,12 @@ def register():
 def lesa():
     u = db.child("user").get().val()
     lst = list(u.items())
-    tala=len(lst)
-    account=[]
-    for x in range(tala-1):
-        account.append(lst[x])
-    print(lst[0][0]['pwd'])
+    tala=0
+    for x in lst:
+        print(lst[tala][1]['usr'])
+        tala = tala + 1
     print(lst[0][1]['usr'])
+    print(lst[1][1]['usr'])
     return "Lesum úr grunni"
 """
 if __name__ == "__main__":
