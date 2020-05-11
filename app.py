@@ -34,7 +34,7 @@ config = {
 
 fb = pyrebase.initialize_app(config)
 db = fb.database()
-account = []    
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     try:
@@ -51,23 +51,24 @@ def index():
                 PWD = i[1]['pwd']
                 if nafn == ID and lykilord == PWD:
                     return render_template("User.html", ID = ID, PWD = PWD)
-                elif nafn == ID and lykilord != PWD:
+                if nafn == ID and lykilord != PWD:
                     return '<h1>Vitlaust lykilorð!</h1>'
-                elif nafn != ID:
+                if nafn != ID:
                     talaID = talaID + 1
-                elif talaID == teljari:
-                    return '<h1>Notandi ekki til!!!</h1>'
-                else:
-                    talaID = talaID + 1
+                    print(talaID)
+                    print(teljari)
+                if talaID == teljari:
+                    return '<h1>Notandi ekki til</h1>'
 
     except:
         return "<h1>Notandi ekki til. Reyndu aftur!</h1>"
     return render_template("home.html")
 
-@app.route('/user/<id>', methods=['GET', 'POST'])
-def Logged(id):
-    return render_template("Login.html")
+@app.route('/register')
+def register():
+    return render_template("register.html")
 
+account = []
 @app.route('/info', methods=['GET', 'POST'])
 def info():
     print(account)
@@ -82,10 +83,6 @@ def info():
         return '<h1>Account created<h1> <br><a href="/">Return to homepage</a>'
     else:
         return "<h1>ma ekki </h1>"
-
-@app.route('/register')
-def register():
-    return render_template("register.html")
 
 """
 @app.route('/lesa')
