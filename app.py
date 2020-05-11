@@ -34,8 +34,7 @@ config = {
 
 fb = pyrebase.initialize_app(config)
 db = fb.database()
-
-
+account = []    
 @app.route('/', methods=['GET', 'POST'])
 def index():
     try:
@@ -44,18 +43,23 @@ def index():
             lykilord = request.form['lykilord']
             u = db.child("user").get().val()
             lst = list(u.items())
-            tala = 0
+            talaID= 0
+            teljari= len(lst)
             for i in lst:
-                ID = lst[tala][1]['usr']
-                PWD = lst[tala][1]['pwd']
+                print(i)
+                ID = i[1]['usr']
+                PWD = i[1]['pwd']
                 if nafn == ID and lykilord == PWD:
                     return render_template("User.html", ID = ID, PWD = PWD)
                 elif nafn == ID and lykilord != PWD:
-                    return "<h1>Vitlaust lykilorð</h1>"
+                    return '<h1>Vitlaust lykilorð!</h1>'
                 elif nafn != ID:
-                    return "<h1>notandi ekki til</h1>"
+                    talaID = talaID + 1
+                elif talaID == teljari:
+                    return '<h1>Notandi ekki til!!!</h1>'
                 else:
-                    tala = tala + 1
+                    talaID = talaID + 1
+
     except:
         return "<h1>Notandi ekki til. Reyndu aftur!</h1>"
     return render_template("home.html")
@@ -66,16 +70,16 @@ def Logged(id):
 
 @app.route('/info', methods=['GET', 'POST'])
 def info():
-    account = []
+    print(account)
     if request.method == 'POST':
         notendanafn = request.form['notendanafn']
         lykilord = request.form['lykilord']
-        account.append(notendanafn)
-        if notendanafn not in account:
-            db.child("user").push({"usr":notendanafn, "pwd":lykilord}) 
-            return '<h1>Account created<h1> <br><a href="/">Return to homepage</a>'
-        else:
+        if notendanafn in account:
             return "<h1>Notandanafn tekin. Veldu annað!</h1>"
+        db.child("user").push({"usr":notendanafn, "pwd":lykilord})
+        nam=notendanafn
+        account.append(nam) 
+        return '<h1>Account created<h1> <br><a href="/">Return to homepage</a>'
     else:
         return "<h1>ma ekki </h1>"
 
